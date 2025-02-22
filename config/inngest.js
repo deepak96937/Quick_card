@@ -20,8 +20,12 @@ export const syncUserCreation = inngest.createFunction(
             name: first_name + " " + last_name,
             imageUrl: image_url
         }
-        await connectDB()
-        await User.create(userData)
+        try {
+            const user = await User.create(userData);
+            console.log("✅ User Created:", user);
+        } catch (error) {
+            console.error("❌ Error inserting user:", error);
+        }
     }
 )
 
@@ -48,11 +52,11 @@ export const syncUserUpdation = inngest.createFunction(
 //Inngest Function to delete user for the Database
 export const syncUserDeletion = inngest.createFunction(
     {
-        id:'delete-user-with-clerk'
+        id: 'delete-user-with-clerk'
     },
-    {event:'clerk/user.deleted'},
-    async ({event})=>{
-        const {id} = event.data
+    { event: 'clerk/user.deleted' },
+    async ({ event }) => {
+        const { id } = event.data
 
         await connectDB()
         await User.findByIdAndDelete(id)
